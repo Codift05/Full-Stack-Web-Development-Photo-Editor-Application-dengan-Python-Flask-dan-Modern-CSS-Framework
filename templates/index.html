@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Photo Editor</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>Photo Editor</h1>
+
+    <form id="uploadForm" enctype="multipart/form-data">
+      <input type="file" id="fileInput" name="image" accept="image/*" required />
+      <button type="submit">Upload</button>
+    </form>
+
+    <div class="editor" id="editor" style="display: none;">
+      <img id="preview" alt="Uploaded Image" />
+
+      <div class="controls">
+        <button onclick="applyEffect('grayscale')">Grayscale</button>
+        <button onclick="applyEffect('invert')">Invert</button>
+        <button onclick="applyEffect('mirror')">Mirror</button>
+        <button onclick="applyEffect('flip')">Flip</button>
+        <button onclick="applyEffect('blur')">Blur</button>
+        <button onclick="applyEffect('sharpen')">Sharpen</button>
+        <button onclick="applyEffect('brightness_up')">Brighten</button>
+        <button onclick="applyEffect('contrast_up')">Contrast</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentFilename = '';
+
+    document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData();
+      const fileInput = document.getElementById('fileInput');
+      formData.append('image', fileInput.files[0]);
+
+      // Path seperti '/upload' ini adalah root-relative
+      const response = await fetch('/upload', {
+        method: 'POST',
+        body: formData
+      });
+
+      currentFilename = await response.text();
+      const preview = document.getElementById('preview');
+      // Path seperti '/uploads/...' ini juga root-relative
+      preview.src = `/uploads/${currentFilename}?t=${Date.now()}`;
+      document.getElementById('editor').style.display = 'block';
+    });
+
+    async function applyEffect(effect) {
+      if (!currentFilename) return;
+      const preview = document.getElementById('preview');
+      // Path seperti '/process/...' ini juga root-relative
+      preview.src = `/process/${currentFilename}/${effect}?t=${Date.now()}`;
+    }
+  </script>
+</body>
+</html>

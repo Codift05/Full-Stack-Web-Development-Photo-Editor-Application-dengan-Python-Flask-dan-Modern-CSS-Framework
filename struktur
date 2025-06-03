@@ -1,0 +1,9 @@
+photo-editor-web/
+├── static/
+│   └── style.css
+├── templates/
+│   └── index.html
+├── uploads/
+├── processed/
+├── app.py
+└── image_processor.py
